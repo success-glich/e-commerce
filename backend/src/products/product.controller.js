@@ -1,47 +1,36 @@
 const Products = require("./product");
+const catchAsyncError = require("../middlewares/catchAsyncError");
+const ErrorHandler = require("../utils/errorHandler");
+const ApiFeatures = require("../utils/apiFeature");
 
-const getAllProducts = async (req, res) => {
-  try {
-    const products = await Products.find({});
-    return res.status(200).json({
-      success: true,
-      products,
-    });
-  } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: "there was error while fetching products",
-      error: error.message,
-    });
-  }
-};
+const getAllProducts = catchAsyncError(async (req, res) => {
+  const apiFeature = new ApiFeatures(Products.find(), req.query)
+    .search()
+    .filter();
 
-const getProductDetails = async (req, res) => {
+  let products = await apiFeature.query;
+
+  return res.status(200).json({
+    success: true,
+    numOfProduct: products.length,
+    products,
+  });
+});
+
+const getProductDetails = catchAsyncError(async (req, res, next) => {
   const { id } = req.params;
 
-  try {
-    const product = await Products.findById(id);
-
-    if (!product) {
-      return res.status(400).json({
-        success: false,
-        message: "no product found",
-        error: error.message,
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      message: "product found successfully",
-      product,
-    });
-  } catch (err) {
-    return res.status(400).json({
-      success: false,
-      message: "Failed to fetch product with id",
-      error: err.message,
-    });
+  const product = await Products.findById(id);
+  if (!product) {
+    return next(new ErrorHandler("product not found !", 404));
   }
-};
+
+  return res.status(200).json({
+    success: true,
+    message: "product found successfully",
+    product,
+  });
+});
 
 // Create Product -- Admin
 const createProduct = async (req, res) => {
