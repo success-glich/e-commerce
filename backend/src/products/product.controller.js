@@ -3,10 +3,12 @@ const catchAsyncError = require("../middlewares/catchAsyncError");
 const ErrorHandler = require("../utils/errorHandler");
 const ApiFeatures = require("../utils/apiFeature");
 
-const getAllProducts = catchAsyncError(async (req, res) => {
+const getAllProducts = catchAsyncError(async (req, res, next) => {
+  const resultPerPage = 8;
   const apiFeature = new ApiFeatures(Products.find(), req.query)
     .search()
-    .filter();
+    .filter()
+    .pagination(resultPerPage);
 
   let products = await apiFeature.query;
 
@@ -91,10 +93,50 @@ const updateProduct = async (req, res) => {
   }
 };
 
+//Create New Review or Update the review
+const createProductReview = catchAsyncError(async (req, res, next) => {
+  const { rating, comment, productId } = req.body;
+
+  const review = {
+    user: req.user._id,
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+  };
+  const product = await Products.findById(productId);
+  if (!product) {
+    return next(new ErrorHandler("Product does not exits with Id:", 400));
+  }
+  const isReviewed = product.reviews.find(
+    (rev) => rev.user.toString() === req.user._id.toString()
+  );
+  if (isReviewed) {
+    product.reviews.forEach((rev) => {
+      if (rev.user.toString() === req.user._id.toString()) {
+        rev.rating = rating;
+        rev.comment = comment;
+      }
+    });
+  } else {
+    product.reviews.push(review);
+    product.numOfReviews = product.reviews.length;
+  }
+  product.ratings =
+    product.reviews.reduce((acc, rev) => {
+      acc += Number(rev.rating);
+      return acc;
+    }, 0) / product.reviews.length;
+
+  await product.save({ validateBeforeSave: false });
+  res.status(200).json({
+    success: true,
+  });
+});
 module.exports = {
   getAllProducts,
   getProductDetails,
   createProduct,
   deleteProduct,
   updateProduct,
+  createProductReview,
 };
