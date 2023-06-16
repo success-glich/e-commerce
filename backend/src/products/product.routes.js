@@ -6,6 +6,8 @@ const {
   deleteProduct,
   updateProduct,
   createProductReview,
+  getProductReviews,
+  deleteReview,
 } = require("./product.controller");
 const {
   isAuthenticatedUser,
@@ -26,6 +28,11 @@ productRouter.post(
   createProduct
 );
 productRouter.route("/review").put(isAuthenticatedUser, createProductReview);
+productRouter
+  .route("/reviews")
+  .get(getProductReviews)
+  .delete(isAuthenticatedUser, deleteReview);
+
 productRouter
   .route("/:id")
   .get(getProductDetails)

@@ -43,6 +43,7 @@ const options = {
   cartIconColorHover: "#eb4034",
   cartIconMargin: "1vmax",
 };
+
 const Header = () => {
   return <ReactNavbar {...options} />;
 };

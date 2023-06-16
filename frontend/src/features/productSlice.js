@@ -1,25 +1,33 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:4000/api/v1/products";
+const BASE_URL = "http://localhost:4000/api/v1";
 const initialState = {
   isLoading: false,
   error: null,
   product: {},
   products: [],
+  productsCount: 0,
+  resultPerPage: null,
 };
 export const fetchProducts = createAsyncThunk(
   "/product/fetchProducts",
-  async () => {
-    const res = await axios(BASE_URL);
-    const data = await res.data.products;
+  async (keyword = "", currentPage = 1) => {
+    console.log(currentPage);
+    const url = `${BASE_URL}/products/?keyword=${keyword}&page=${currentPage}`;
+    console.log({
+      urlfromslice: url,
+    });
+
+    const res = await axios(`${url}`);
+    const data = await res.data;
     return data;
   }
 );
 export const fetchProduct = createAsyncThunk(
   "/product/fetchProduct",
   async (productId) => {
-    const relativeURL = `${BASE_URL}/${productId}`;
+    const relativeURL = `${BASE_URL}/products/${productId}`;
     const res = await axios(relativeURL);
     const data = await res.data.product;
     return data;
@@ -28,14 +36,21 @@ export const fetchProduct = createAsyncThunk(
 const productSlice = createSlice({
   name: "product",
   initialState,
-  reducers: {},
+  reducers: {
+    clearErrors(state) {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchProducts.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(fetchProducts.fulfilled, (state, action) => {
       state.isLoading = false;
-      state.products = action.payload;
+      state.products = action.payload.products;
+      // console.log(products);
+      state.resultPerPage = action.payload.resultPerPage;
+      state.productsCount = action.payload.productsCount;
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
       state.isLoading = false;
@@ -55,3 +70,4 @@ const productSlice = createSlice({
   },
 });
 export default productSlice.reducer;
+export const { clearErrors } = productSlice.actions;

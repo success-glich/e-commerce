@@ -4,21 +4,28 @@ import App from "./App";
 import store from "./app/store";
 import { Provider } from "react-redux";
 import { positions, transitions, Provider as AlertProvider } from "react-alert";
-import AlertTemplate from "react-alert-template-basic";
-
-const options = {
-  timeout: 5000,
-  position: positions.BOTTOM_CENTER,
-  transition: transitions.SCALE,
-};
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ErrorBoundary from "./component/layout/ErrorBoundary";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>
     <Provider store={store}>
-      <AlertProvider template={AlertTemplate} {...options}>
+      <ErrorBoundary fallback={<p>Something went wrong </p>}>
         <App />
-      </AlertProvider>
+      </ErrorBoundary>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </Provider>
   </>
 );
