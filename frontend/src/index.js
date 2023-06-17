@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import store from "./app/store";
 import { Provider } from "react-redux";
-import { positions, transitions, Provider as AlertProvider } from "react-alert";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ErrorBoundary from "./component/layout/ErrorBoundary";

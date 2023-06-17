@@ -9,16 +9,14 @@ const initialState = {
   products: [],
   productsCount: 0,
   resultPerPage: null,
+  filteredProductCount: 0,
 };
 export const fetchProducts = createAsyncThunk(
   "/product/fetchProducts",
-  async (keyword = "", currentPage = 1) => {
-    console.log(currentPage);
-    const url = `${BASE_URL}/products/?keyword=${keyword}&page=${currentPage}`;
-    console.log({
-      urlfromslice: url,
-    });
-
+  async ({ keyword = "", currentPage = 1, price = [0, 25000] }) => {
+    console.log(currentPage, keyword, price);
+    const url = `${BASE_URL}/products/?keyword=${keyword}&page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}`;
+    console.log(url);
     const res = await axios(`${url}`);
     const data = await res.data;
     return data;
@@ -39,6 +37,8 @@ const productSlice = createSlice({
   reducers: {
     clearErrors(state) {
       state.error = null;
+
+      state.isLoading = false;
     },
   },
   extraReducers: (builder) => {
@@ -48,7 +48,7 @@ const productSlice = createSlice({
     builder.addCase(fetchProducts.fulfilled, (state, action) => {
       state.isLoading = false;
       state.products = action.payload.products;
-      // console.log(products);
+      state.filteredProductCount = action.payload.filteredProductCount;
       state.resultPerPage = action.payload.resultPerPage;
       state.productsCount = action.payload.productsCount;
     });
