@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Search.css";
 import { useNavigate } from "react-router-dom";
+import MetaData from "../layout/MetaData";
 const Search = () => {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const Search = () => {
   };
   return (
     <>
+      <MetaData title="Search --Electrify" />
       <form className="searchBox" onSubmit={searchSubmitHandler}>
         <input
           type="text"

@@ -13,10 +13,10 @@ const Home = () => {
 
   useEffect(() => {
     if (error) {
+      console.log(error);
       toast.error(error || "Server error to fetch Products");
-      return;
     }
-    dispatch(fetchProducts());
+    dispatch(fetchProducts({}));
   }, [dispatch, error]);
   return (
     <>

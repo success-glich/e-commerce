@@ -7,6 +7,7 @@ import { fetchProduct } from "../../features/productSlice";
 import ReactStars from "react-rating-stars-component";
 import ReviewCard from "./ReviewCard";
 import Loader from "../layout/Loader/Loader";
+import MetaData from "../layout/MetaData";
 import { toast } from "react-toastify";
 const ProductDetails = () => {
   const { id } = useParams();
@@ -32,6 +33,8 @@ const ProductDetails = () => {
         <Loader />
       ) : (
         <>
+          <MetaData title={`${product.name} --Electrify`} />
+
           <div className="ProductDetails">
             <div className="carousel">
               <Carousel>

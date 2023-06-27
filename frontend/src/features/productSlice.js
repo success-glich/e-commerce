@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const BASE_URL = "http://localhost:4000/api/v1";
@@ -13,11 +13,20 @@ const initialState = {
 };
 export const fetchProducts = createAsyncThunk(
   "/product/fetchProducts",
-  async ({ keyword = "", currentPage = 1, price = [0, 25000] }) => {
-    console.log(currentPage, keyword, price);
-    const url = `${BASE_URL}/products/?keyword=${keyword}&page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}`;
+  async ({
+    keyword = "",
+    currentPage = 1,
+    price = [0, 25000],
+    category,
+    ratings = 0,
+  }) => {
+    let url = `${BASE_URL}/products/?keyword=${keyword}&page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}&ratings[gte]=${ratings}`;
+    if (category) {
+      url = `${BASE_URL}/products/?keyword=${keyword}&page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}&category=${category}&ratings[gte]=${ratings}`;
+    }
     console.log(url);
-    const res = await axios(`${url}`);
+
+    const res = await axios(url);
     const data = await res.data;
     return data;
   }
@@ -54,6 +63,7 @@ const productSlice = createSlice({
     });
     builder.addCase(fetchProducts.rejected, (state, action) => {
       state.isLoading = false;
+
       state.error = action.error.message;
     });
     builder.addCase(fetchProduct.pending, (state) => {
