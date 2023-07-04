@@ -1,21 +1,20 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import instance from "../api/api_instance";
-
+import instance from "../../api/api_instance";
+import cookie, { load } from "react-cookies";
+import getUserDetailsFromToken from "../../helpers/jwt";
+import { isEmpty } from "loadsh";
 //login
 export const login = createAsyncThunk(
   "user/login",
   async ({ email, password }) => {
     try {
-      const config = { headers: { "Content-Type": "application/json" } };
-      // const relativeURL = `${BASE_URL}/login`;
-
       const { data } = await instance({
         url: "auth/login",
         method: "POST",
         data: { email, password },
       });
-
       localStorage.setItem("token", data.token);
+      // cookie.save("token", data.token);
       // dispatch(setUser());
       return data;
     } catch (error) {
@@ -40,11 +39,22 @@ export const register = createAsyncThunk("user/register", async (userData) => {
     });
     return data;
   } catch (err) {
-    console.log(err);
-    return err;
+    return err.response.data.message;
   }
 });
-export const loadUser = createAsyncThunk("user/loadUser", async () => {});
+export const loadUser = createAsyncThunk("user/loadUser", async () => {
+  try {
+    const { data } = await instance({
+      url: "auth/me",
+      method: "get",
+    });
+    console.log(data.response);
+    return data;
+  } catch (err) {
+    throw err.message;
+  }
+});
+
 const initialState = {
   user: null,
   loading: false,
@@ -58,11 +68,21 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     // other reducers...
-    setUser: (state, action) => {
-      // state.user = action.payload;
-    },
     getUserData: (state) => {
+      const token = load("token");
+      const userData = getUserDetailsFromToken(token);
+      // const isAuthenticated = !isEmpty;
+      state.tokens = {
+        accessToken: token,
+      };
+      state.isUserLoggedIn = !isEmpty(userData);
+      state.userData = userData;
+    },
+    logoutUser: (state) => {
       // const
+      cookie.remove("token", { path: "/" });
+      state.tokens = {};
+      state.isAuthenticated = false;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -99,6 +119,19 @@ const userSlice = createSlice({
       .addCase(register.rejected, (state, { error }) => {
         state.loading = false;
         state.error = error.message;
+      })
+      .addCase(loadUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loadUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload?.user;
+      })
+      .addCase(loadUser.rejected, (state) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
       });
   },
 });

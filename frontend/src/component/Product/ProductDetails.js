@@ -3,7 +3,7 @@ import Carousel from "react-material-ui-carousel";
 import "./ProductDetails.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { fetchProduct } from "../../features/productSlice";
+import { fetchProduct } from "../../app/features/productSlice";
 import ReactStars from "react-rating-stars-component";
 import ReviewCard from "./ReviewCard";
 import Loader from "../layout/Loader/Loader";

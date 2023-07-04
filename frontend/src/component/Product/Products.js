@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Products.css";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchProducts, clearErrors } from "../../features/productSlice";
+import { fetchProducts, clearErrors } from "../../app/features/productSlice";
 import Loader from "../layout/Loader/Loader";
 import ProductCard from "../Home/ProductCard";
 import { toast } from "react-toastify";

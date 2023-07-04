@@ -30,7 +30,7 @@ const registerUser = catchAsyncError(async (req, res, next) => {
 //login User
 const loginUser = catchAsyncError(async (req, res, next) => {
   const { email, password } = req.body;
-  //checking if user has given password and email both
+
   if (!email || !password) {
     return next(new ErrorHandler("Please Enter Email and Password", 400));
   }

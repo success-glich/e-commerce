@@ -3,13 +3,15 @@ const ErrorHandler = require("../utils/errorHandler");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config/vars");
 const User = require("../user/user");
-const isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
-  const { token } = req.cookies;
 
-  if (!token) {
+const isAuthenticatedUser = catchAsyncError(async (req, res, next) => {
+  // const { token } = req.cookies;
+  const bearerToken = req.headers.authorization;
+  console.log(bearerToken);
+  if (!bearerToken) {
     return next(new ErrorHandler("token is not found please login first", 400));
   }
-  const decodeData = jwt.verify(token, JWT_SECRET);
+  const decodeData = jwt.verify(bearerToken, JWT_SECRET);
   req.user = await User.findById(decodeData.id);
   next();
 });

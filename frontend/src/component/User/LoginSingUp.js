@@ -6,11 +6,10 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import FaceIcon from "@mui/icons-material/Face";
 import Loader from "../layout/Loader/Loader";
 import { useDispatch, useSelector } from "react-redux";
-import { login, register } from "../../features/userSlice";
-import { clearError } from "../../features/userSlice";
+import { login, register, clearError } from "../../app/features/userSlice";
 import { toast } from "react-toastify";
 
-const LoginSignUp = ({ history, location }) => {
+const LoginSignUp = () => {
   const dispatch = useDispatch();
   const { loading, isAuthenticated, error } = useSelector(
     (state) => state.user
@@ -44,14 +43,7 @@ const LoginSignUp = ({ history, location }) => {
 
   const registerSubmit = (e) => {
     e.preventDefault();
-    console.log("Register form submitted");
-
     const myForm = new FormData();
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log(avatar);
-
     myForm.set("name", name);
     myForm.set("email", email);
     myForm.set("password", password);

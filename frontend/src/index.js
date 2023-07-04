@@ -6,7 +6,9 @@ import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ErrorBoundary from "./component/layout/ErrorBoundary";
+import { loadUser } from "./app/features/userSlice";
 const root = ReactDOM.createRoot(document.getElementById("root"));
+store.dispatch(loadUser());
 root.render(
   <>
     <Provider store={store}>
